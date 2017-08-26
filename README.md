@@ -3,14 +3,14 @@ Go语言反射规则 - The Laws of Reflection
 
 原文地址：[http://blog.golang.org/laws-of-reflection](http://blog.golang.org/laws-of-reflection)
 
-##介绍
+## 介绍
 
 反射在计算机的概念里是指一段程序审查自身结构的能力，主要通过类型进行审查。它是元编程的一种形式，同样也是引起混乱的重大来源。
 
 在这篇文章里我们试图阐明Go语言中的反射是如何工作的。每种语言的反射模型是不同的(许多语言不支持反射），然而本文只与Go有关，所以我们接下来所提到的“反射”都是指Go语言中的反射。
 
 
-##类型与接口
+## 类型与接口
 
 由于反射是建立在类型系统(type system)上的，所以我们先来复习一下Go语言中的类型。
 
@@ -56,7 +56,7 @@ interface{}
 有人说Go的接口是动态类型，这是错误的。它们都是静态类型：虽然在运行时中，接口变量存储的值也许会变，但接口变量的类型是永不会变的。我们必须精确地了解这些，因为反射与接口是密切相关的。
 
 
-##深入接口
+## 深入接口
 
 Russ Cox在博客里写了一篇[详细的文章](http://research.swtch.com/2009/12/go-data-structures-interfaces.html)，讲述了Go中的接口变量的意义。我们不需要列出全文，只需在这里给出一点点总结。
 >一个接口类型的变量里有两样东西：变量的的具体值和这个值的类型描述。更准确地来讲，这个实现了接口的值是一个基础的具体数据项，而类型描述了数据项里的所有类型。
@@ -91,7 +91,7 @@ empty = w
 好了，现在让我们进入反射部分。
 
 
-##反射规则（一） - 从接口到反射对象
+## 反射规则（一） - 从接口到反射对象
 
 在基础上，反射是一个审查在接口变量中的`(type, value)`组合的机制。现在，我们需要了解[reflect包](https://gowalker.org/reflect)中的两个类型：`Type`和`Value`，可以让我们访问接口变量的内容。`reflect.TypeOf`函数和`reflect.ValueOf`函数返回的`reflect.Type`和`reflect.Value`可以拼凑出一个接口值。（当然，从`reflect.Value`可以很轻易地得到`reflect.Type`，但现在还是让我们把`Value`和`Type`的概念分开来看。）
 
@@ -167,7 +167,7 @@ v := reflect.ValueOf(x)
 虽然`x`的静态类型是`MyInt`而非`int`，但`v`的`Kind`依然是`reflect.Int`。虽然`Type`可以区分开`int`和`MyInt`，但`Kind`无法做到。
 
 
-##反射规则（二） - 从反射对象到接口
+## 反射规则（二） - 从反射对象到接口
 
 如同物理学中的反射一样，Go语言的反射也是可逆的。
 
@@ -206,7 +206,7 @@ fmt.Printf("value is %7.1e\n", v.Interface())
 (Reflection goes from interface values to reflection objects and back again.)
 
 
-##反射规则（三） - 若要修改反射对象，值必须可设置
+## 反射规则（三） - 若要修改反射对象，值必须可设置
 
 第三条规则是最微妙同时也是最混乱的，但如果我们从它的基本原理开始，那么一切都不在话下。
 
@@ -298,7 +298,7 @@ fmt.Println(x)
 记住，用反射修改数据的时候需要传入它的指针哦。
 
 
-##结构体
+## 结构体
 
 在前面的例子中，`v`并不是指针本身，它只是来源于此。
 我们一般在使用反射去修改结构体字段的时候会用到。只要我们有结构体的指针，我们就可以修改它的字段。
@@ -341,7 +341,7 @@ t is now {77 Sunset Strip}
 如果我们修改了程序让`s`由`t`（而不是`&t`）创建，程序就会在调用`SetInt`和`SetString`的地方失败，因为`t`的字段是不可设置的。
 
 
-##结论
+## 结论
 再次列出反射法则：
 * 反射从接口值到反射对象中(Reflection goes from interface value to reflection object.)
 * 反射从反射对象到接口值中(Reflection goes from reflection object to interface value.)
